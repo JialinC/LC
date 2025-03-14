@@ -1,6 +1,18 @@
 # BFS/DFS directions
 dir = [(1, 0), (-1, 0), (0, 1), (0, -1)]
 
+# keyboad
+dic = {
+    "2": ["a", "b", "c"],
+    "3": ["d", "e", "f"],
+    "4": ["g", "h", "i"],
+    "5": ["j", "k", "l"],
+    "6": ["m", "n", "o"],
+    "7": ["p", "q", "r", "s"],
+    "8": ["t", "u", "v"],
+    "9": ["w", "x", "y", "z"],
+}
+
 # Bisect_left a[:i] have e < x, and all e in a[i:] have e >= x
 
 while lo < hi:
