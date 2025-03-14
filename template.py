@@ -57,3 +57,32 @@ digits = [1, 2, 3]
 length = 2
 result = list(product(digits, repeat=length))
 # [(1, 1), (1, 2), (1, 3), (2, 1), (2, 2), (2, 3), (3, 1), (3, 2), (3, 3)]
+
+# DFS Topological Sort
+
+
+# BFS Topological Sort Kahn’s Algorithm (BFS Topological Sorting) can be used to detect cycles in a directed graph.
+indegree = [0] * numCourses
+for i in prerequisites:
+    indegree[i[0]] += 1  # Increase in-degree of course i[0]
+
+q = deque()
+for i, v in enumerate(indegree):
+    if v == 0:
+        q.append
+
+ind = 0
+while q:
+    c = q.popleft()
+    result[ind] = c
+    ind += 1
+
+    for i in prerequisites:
+        if i[1] == c:
+            indegree[i[0]] -= 1
+            if indegree[i[0]] == 0:
+                q.append(i[0])
+
+if sum(indegree) > 0:
+    return []
+return result
