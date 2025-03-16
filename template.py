@@ -1,3 +1,6 @@
+# random generate a index in a range
+random.randint(0, len(l) - 1)
+
 # BFS/DFS directions
 dir = [(1, 0), (-1, 0), (0, 1), (0, -1)]
 
