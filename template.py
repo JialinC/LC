@@ -1,4 +1,14 @@
-# random generate a index in a range
+### Data structure ###
+d = OrderedDict.fromkeys("abcde")
+d.move_to_end("b")
+"".join(d)
+# 'acdeb'
+d.move_to_end("b", last=False)
+"".join(d)
+# 'bacde'
+
+### Gereral function ###
+# random generate a index in a range Example list
 random.randint(0, len(l) - 1)
 
 # BFS/DFS directions
