@@ -1,4 +1,5 @@
 ### Data structure ###
+# OrderedDict, can be used to implement LRU cache
 d = OrderedDict.fromkeys("abcde")
 d.move_to_end("b")
 "".join(d)
@@ -26,6 +27,49 @@ dic = {
     "9": ["w", "x", "y", "z"],
 }
 
+
+### Binary Tree ###
+# Inorder Serialization with DFS
+class Codec:
+    def serialize(self, root):
+        """Encodes a tree to a single string.
+        :type root: TreeNode
+        :rtype: str
+        """
+
+        def ser(root, s):
+            if not root:
+                s += "None,"
+            else:
+                s += str(root.val) + ","
+                s = ser(root.left, s)
+                s = ser(root.right, s)
+            return s
+
+        return ser(root, "")
+
+    def deserialize(self, data):
+        """Decodes your encoded data to tree.
+        :type data: str
+        :rtype: TreeNode
+        """
+        data = data.split(",")[:-1]
+        index = [0]
+
+        def deser(index):
+            if data[index[0]] == "None":
+                index[0] += 1
+                return None
+            n = TreeNode(data[index[0]])
+            index[0] += 1
+            n.left = deser(index)
+            n.right = deser(index)
+            return n
+
+        return deser(index)
+
+
+### Binary Search ###
 # Bisect_left a[:i] have e < x, and all e in a[i:] have e >= x
 
 while lo < hi:
