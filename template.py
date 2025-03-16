@@ -11,6 +11,8 @@ d.move_to_end("b", last=False)
 ### Gereral function ###
 # random generate a index in a range Example list
 random.randint(0, len(l) - 1)
+# randomly select an element from a list
+random.choice(l)
 
 # BFS/DFS directions
 dir = [(1, 0), (-1, 0), (0, 1), (0, -1)]
