@@ -88,7 +88,19 @@ def preorderTraversal(self, root: Optional[TreeNode]) -> List[int]:
             stk.append(cur.left)
     return res
 
-
+# Iterative In-order Traversal
+def inorderTraversal(self, root: TreeNode) -> List[int]:
+    res = []
+    stk = []
+    cur = root
+    while cur or stk:
+        while cur:
+            stk.append(cur)
+            cur = cur.left
+        cur = stk.pop()
+        res.append(cur.val)
+        cur = cur.right
+    return res
 
 
 
