@@ -102,7 +102,20 @@ def inorderTraversal(self, root: TreeNode) -> List[int]:
         cur = cur.right
     return res
 
-
+# Iterative Post-order Traversal
+def postorderTraversal(self, root: Optional[TreeNode]) -> List[int]:
+    if not root:
+        return []
+    res = []
+    stk = [root]
+    while stk:
+        cur = stk.pop()
+        res.append(cur.val)
+        if cur.left:
+            stk.append(cur.left)
+        if cur.right:
+            stk.append(cur.right)
+    return res[::-1]
 
 
 # Pre-order Serialization with DFS
