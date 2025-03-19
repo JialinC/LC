@@ -8,11 +8,26 @@ d.move_to_end("b", last=False)
 "".join(d)
 # 'bacde'
 
-### Gereral function ###
+### Gereral/Common ideas ###
 # random generate a index in a range Example list
 random.randint(0, len(l) - 1)
 # randomly select an element from a list
 random.choice(l)
+
+# Sorts indices based on the values in arr
+temp = sorted(range(n), key=lambda x: arr[x])
+
+# Rotate 90 degrees
+#  (i, j) → (j, n-1-i)
+def rotate(self, matrix: List[List[int]]) -> None:
+    n = len(matrix[0])
+    for i in range(n // 2 + n % 2):
+        for j in range(n // 2):
+            tmp = matrix[n - 1 - j][i]
+            matrix[n - 1 - j][i] = matrix[n - 1 - i][n - j - 1]
+            matrix[n - 1 - i][n - 1 - j] = matrix[j][n - 1 - i]
+            matrix[j][n - 1 - i] = matrix[i][j]
+            matrix[i][j] = tmp
 
 # BFS/DFS directions
 dir = [(1, 0), (-1, 0), (0, 1), (0, -1)]
@@ -30,9 +45,55 @@ dic = {
     "9": ["w", "x", "y", "z"],
 }
 
+# Checking for overlap between two intervals (start1, end1) and (start2, end2) 
+if max(start1, start2) < min(end1, end2)
 
+# itertools
+from itertools import combinations
+
+digits = [1, 2, 3, 4]
+length = 2  # Choose length of combinations
+result = list(combinations(digits, length))
+# [(1, 2), (1, 3), (1, 4), (2, 3), (2, 4), (3, 4)]
+
+from itertools import permutations
+
+digits = [1, 2, 3, 4]
+length = 2  # Choose length of permutations
+result = list(permutations(digits, length))
+# [(1, 2), (1, 3), (1, 4), (2, 1), (2, 3), (2, 4), (3, 1), (3, 2), (3, 4), (4, 1), (4, 2), (4, 3)]
+
+from itertools import product
+
+digits = [1, 2, 3]
+length = 2
+result = list(product(digits, repeat=length))
+# [(1, 1), (1, 2), (1, 3), (2, 1), (2, 2), (2, 3), (3, 1), (3, 2), (3, 3)]
+
+
+### Algorithms
 ### Binary Tree ###
-# Inorder Serialization with DFS
+# Iterative In-order Traversal
+def preorderTraversal(self, root: Optional[TreeNode]) -> List[int]:
+    if not root:
+        return []
+    res = []
+    stk = [root]
+    while stk:
+        cur = stk.pop()
+        res.append(cur.val)
+        if cur.right:
+            stk.append(cur.right)
+        if cur.left:
+            stk.append(cur.left)
+    return res
+
+
+
+
+
+
+# Pre-order Serialization with DFS
 class Codec:
     def serialize(self, root):
         """Encodes a tree to a single string.
@@ -91,45 +152,7 @@ while lo < hi:
     else:
         hi = mid
 
-# Sorts indices based on the values in arr
-temp = sorted(range(n), key=lambda x: arr[x])
-
-
-# Rotate 90 degrees
-#  (i, j) → (j, n-1-i)
-def rotate(self, matrix: List[List[int]]) -> None:
-    n = len(matrix[0])
-    for i in range(n // 2 + n % 2):
-        for j in range(n // 2):
-            tmp = matrix[n - 1 - j][i]
-            matrix[n - 1 - j][i] = matrix[n - 1 - i][n - j - 1]
-            matrix[n - 1 - i][n - 1 - j] = matrix[j][n - 1 - i]
-            matrix[j][n - 1 - i] = matrix[i][j]
-            matrix[i][j] = tmp
-
-
-# itertools
-from itertools import combinations
-
-digits = [1, 2, 3, 4]
-length = 2  # Choose length of combinations
-result = list(combinations(digits, length))
-# [(1, 2), (1, 3), (1, 4), (2, 3), (2, 4), (3, 4)]
-
-from itertools import permutations
-
-digits = [1, 2, 3, 4]
-length = 2  # Choose length of permutations
-result = list(permutations(digits, length))
-# [(1, 2), (1, 3), (1, 4), (2, 1), (2, 3), (2, 4), (3, 1), (3, 2), (3, 4), (4, 1), (4, 2), (4, 3)]
-
-from itertools import product
-
-digits = [1, 2, 3]
-length = 2
-result = list(product(digits, repeat=length))
-# [(1, 1), (1, 2), (1, 3), (2, 1), (2, 2), (2, 3), (3, 1), (3, 2), (3, 3)]
-
+### Topological Sort ###
 # DFS Topological Sort
 
 
@@ -158,3 +181,5 @@ while q:
 if sum(indegree) > 0:
     return []
 return result
+
+### Line Sweep algorithm ###
