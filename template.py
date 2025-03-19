@@ -117,6 +117,25 @@ def postorderTraversal(self, root: Optional[TreeNode]) -> List[int]:
             stk.append(cur.right)
     return res[::-1]
 
+# Construct Binary Tree from Inorder and Postorder Traversal
+def helper(in_left, in_right):
+    # if there is no elements to construct subtrees
+    if in_left > in_right:
+        return None
+    
+    # pick up the last element as a root
+    val = postorder.pop()
+    root = TreeNode(val)
+
+    # root splits inorder list
+    # into left and right subtrees
+    index = idx_map[val]
+
+    # build right subtree
+    root.right = helper(index + 1, in_right)
+    # build left subtree
+    root.left = helper(in_left, index - 1)
+    return root
 
 # Pre-order Serialization with DFS
 class Codec:
