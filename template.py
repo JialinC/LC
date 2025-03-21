@@ -178,22 +178,13 @@ class Codec:
 
 ### Binary Searh Tree ###
 # Insert into a Binary Search Tree
-def insertIntoBST(self, root: Optional[TreeNode], val: int) -> Optional[TreeNode]:
+def insert(root, val):
     if not root:
-        return TreeNode(val) # actual insertion
-
-    def dfs(root, val):
-        if root.val < val:
-            if not root.right:
-                root.right = TreeNode(val)
-            else:
-                dfs(root.right,val)
-        else:
-            if not root.left:
-                root.left = TreeNode(val)
-            else:
-                dfs(root.left,val)
-    dfs(root,val)
+        return TreeNode(val)
+    if root.val < val:
+        root.right = insert(root.right,val)
+    if root.val > val:
+        root.left = insert(root.left,val)
     return root
 
 def successor(self,node):
