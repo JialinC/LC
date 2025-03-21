@@ -176,6 +176,58 @@ class Codec:
 
         return deser(index)
 
+### Binary Searh Tree ###
+# Insert into a Binary Search Tree
+def insertIntoBST(self, root: Optional[TreeNode], val: int) -> Optional[TreeNode]:
+    if not root:
+        return TreeNode(val) # actual insertion
+
+    def dfs(root, val):
+        if root.val < val:
+            if not root.right:
+                root.right = TreeNode(val)
+            else:
+                dfs(root.right,val)
+        else:
+            if not root.left:
+                root.left = TreeNode(val)
+            else:
+                dfs(root.left,val)
+    dfs(root,val)
+    return root
+
+def successor(self,node):
+    node = node.right
+    while node.left:
+        node = node.left
+    return node.val
+
+def predecessor(self,node):
+    node = node.left
+    while node.right:
+        node = node.right
+    return node.val
+
+def deleteNode(self, root: TreeNode, key: int) -> TreeNode:
+    if not root:
+        return None
+
+    if key == root.val:
+        if root.right:
+            su = self.successor(root)
+            root.val = su
+            root.right = self.deleteNode(root.right,su)
+        elif root.left:
+            pr = self.predecessor(root)
+            root.val = pr
+            root.left = self.deleteNode(root.left,pr)
+        else:
+            root=None # actual deletion
+    elif key > root.val:
+        root.right = self.deleteNode(root.right,key)
+    else:
+        root.left = self.deleteNode(root.left,key)
+    return root
 
 ### Binary Search ###
 # Bisect_left a[:i] have e < x, and all e in a[i:] have e >= x
