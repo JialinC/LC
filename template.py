@@ -14,6 +14,11 @@ random.randint(0, len(l) - 1)
 # randomly select an element from a list
 random.choice(l)
 
+# diagonal index
+diagonal = row - col
+# anti-diagonal index
+anti_diagonal = row + col
+
 # Sorts indices based on the values in arr
 temp = sorted(range(n), key=lambda x: arr[x])
 
@@ -44,6 +49,15 @@ dic = {
     "8": ["t", "u", "v"],
     "9": ["w", "x", "y", "z"],
 }
+
+# Sudoku
+tx = i//3
+ty = j//3
+
+# Sudoku 3x3 box
+tx = i//3*3
+ty = j//3*3
+txt = [board[x+tx][y+ty] for x in range(3) for y in range(3) if board[x+tx][y+ty] != '.']
 
 # Checking for overlap between two intervals (start1, end1) and (start2, end2) 
 if max(start1, start2) < min(end1, end2)
@@ -352,5 +366,19 @@ def partition(lst, lo, hi):
     return i
 
 
-
+### Backtracking ###
+def backtrack(candidate):
+    if find_solution(candidate):
+        output(candidate)
+        return
+    
+    # iterate all possible candidates.
+    for next_candidate in list_of_candidates:
+        if is_valid(next_candidate):
+            # try this partial candidate solution
+            place(next_candidate)
+            # given the candidate, explore further.
+            backtrack(next_candidate)
+            # backtrack
+            remove(next_candidate)
 
