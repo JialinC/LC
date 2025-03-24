@@ -284,6 +284,26 @@ if sum(indegree) > 0:
 return result
 
 ### Line Sweep algorithm ###
+# A line sweep algorithm (also called a sweep line algorithm) comes from computational geometry. 
+# The idea is: You imagine a vertical line "sweeping" from left to right across the number line (or 2D space), and you process events in the order they occur along that line.
+def __init__(self):
+    self.open_interval = []
+    self.overlapping = 2
+
+def book(self, start: int, end: int) -> bool:
+    s = bisect_left(self.open_interval,(start,1))
+    self.open_interval.insert(s,(start,1))
+    e = bisect_left(self.open_interval,(end-0.5,-1))
+    self.open_interval.insert(e,(end-0.5,-1))
+    cur = 0
+    
+    for i,v in self.open_interval:
+        cur+=v
+        if cur > 2:
+            del self.open_interval[e]
+            del self.open_interval[s]
+            return False
+    return True
 
 # Divide and Conquer
 def divide_and_conquer( S ):
