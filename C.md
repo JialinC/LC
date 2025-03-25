@@ -1651,6 +1651,136 @@ TCP（Transmission Control Protocol）和 UDP（User Datagram Protocol）都是 
 
 
 
+# 请你说说 TCP 三次握手与四次挥手过程
+
+---
+
+## ✅ 一、TCP 三次握手（建立连接）
+
+三次握手用于在通信双方之间建立可靠的连接，确保**客户端和服务器都准备好收发数据**。
+
+### 📌 三次握手过程：
+
+1. **第一次握手**（客户端 → 服务器）：
+   - 客户端发送 SYN 报文，请求建立连接。
+   - `SYN = 1, seq = x`
+   - 状态：客户端进入 `SYN_SENT`
+
+2. **第二次握手**（服务器 → 客户端）：
+   - 服务器收到请求后应答，同意连接。
+   - `SYN = 1, ACK = 1, seq = y, ack = x + 1`
+   - 状态：服务器进入 `SYN_RECEIVED`
+
+3. **第三次握手**（客户端 → 服务器）：
+   - 客户端收到确认后再次发送 ACK 报文。
+   - `ACK = 1, seq = x + 1, ack = y + 1`
+   - 状态：客户端进入 `ESTABLISHED`，服务器收到后也进入 `ESTABLISHED`
+
+### ✅ 为什么是三次而不是两次？
+三次握手的第三次是为了防止**历史失效连接请求重复传到服务器导致误连接**，确保客户端确实知道服务器“收到了连接请求”。
+![三次握手](/image/tcp_three_way_handshake.png)
+
+---
+
+## ✅ 二、TCP 四次挥手（释放连接）
+
+四次挥手用于双方向对方确认“我没有数据要发了”并释放资源。TCP 是全双工通信，**双方需要各自关闭连接**。
+
+### 📌 四次挥手过程（以客户端主动关闭为例）：
+
+1. **第一次挥手**（客户端 → 服务器）：
+   - 客户端发送 FIN 报文，请求断开连接。
+   - `FIN = 1, seq = u`
+   - 状态：客户端进入 `FIN_WAIT_1`
+
+2. **第二次挥手**（服务器 → 客户端）：
+   - 服务器确认客户端请求。
+   - `ACK = 1, ack = u + 1`
+   - 状态：客户端进入 `FIN_WAIT_2`，服务器进入 `CLOSE_WAIT`
+
+3. **第三次挥手**（服务器 → 客户端）：
+   - 服务器也发送 FIN 报文，请求关闭连接。
+   - `FIN = 1, seq = w`
+   - 状态：服务器进入 `LAST_ACK`
+
+4. **第四次挥手**（客户端 → 服务器）：
+   - 客户端确认收到 FIN 报文。
+   - `ACK = 1, ack = w + 1`
+   - 状态：客户端进入 `TIME_WAIT`，等待 2MSL 后进入 `CLOSED`；服务器收到后立即进入 `CLOSED`
+
+### ✅ 为什么是四次而不是三次？
+因为 TCP 是全双工，关闭一端连接需要 **双方分别发送 FIN + ACK**，不能合并完成，因此必须四次。
+
+---
+
+## ✅ 一句话总结
+
+> TCP 通过**三次握手建立可靠连接**，通过**四次挥手有序释放资源**，是保障网络通信可靠性的重要机制。
+
+# Please explain the TCP Three-Way Handshake and Four-Way Teardown process
+
+---
+
+## ✅ 1. TCP Three-Way Handshake (Connection Establishment)
+
+The three-way handshake is used to establish a reliable connection between the client and the server, ensuring **both parties are ready to send and receive data**.
+
+### 📌 Handshake steps:
+
+1. **First handshake** (Client → Server):
+   - The client sends a SYN packet to request a connection.
+   - `SYN = 1, seq = x`
+   - State: Client enters `SYN_SENT`
+
+2. **Second handshake** (Server → Client):
+   - The server receives the request and replies to acknowledge.
+   - `SYN = 1, ACK = 1, seq = y, ack = x + 1`
+   - State: Server enters `SYN_RECEIVED`
+
+3. **Third handshake** (Client → Server):
+   - The client receives the acknowledgment and sends an ACK packet.
+   - `ACK = 1, seq = x + 1, ack = y + 1`
+   - State: Client enters `ESTABLISHED`, and upon receiving this, the server also enters `ESTABLISHED`
+
+### ✅ Why three times and not just two?
+The third handshake is necessary to **prevent old or duplicated connection requests from being misinterpreted** by the server as new ones. It ensures the client knows the server **received the initial connection request**.
+
+---
+
+## ✅ 2. TCP Four-Way Teardown (Connection Termination)
+
+The four-way teardown is used so that **both sides confirm they have no more data to send**. Since TCP is full-duplex, **each side must close the connection independently**.
+
+### 📌 Teardown steps (client initiates closure):
+
+1. **First teardown** (Client → Server):
+   - The client sends a FIN packet to request disconnection.
+   - `FIN = 1, seq = u`
+   - State: Client enters `FIN_WAIT_1`
+
+2. **Second teardown** (Server → Client):
+   - The server acknowledges the client's FIN.
+   - `ACK = 1, ack = u + 1`
+   - State: Client enters `FIN_WAIT_2`, server enters `CLOSE_WAIT`
+
+3. **Third teardown** (Server → Client):
+   - The server sends a FIN packet to also request closing its side.
+   - `FIN = 1, seq = w`
+   - State: Server enters `LAST_ACK`
+
+4. **Fourth teardown** (Client → Server):
+   - The client acknowledges the server’s FIN.
+   - `ACK = 1, ack = w + 1`
+   - State: Client enters `TIME_WAIT`, waits for 2 * MSL (Maximum Segment Lifetime), then transitions to `CLOSED`; the server also enters `CLOSED` after receiving the ACK.
+
+### ✅ Why four steps instead of three?
+Because TCP is full-duplex, each direction of the connection must be closed **independently**, and each close requires a **FIN + ACK** exchange. These can't be combined, so **four steps are needed**.
+
+---
+
+## ✅ One-sentence summary
+
+> TCP uses a **three-way handshake to establish a reliable connection** and a **four-way teardown to release the connection properly**, ensuring robust and orderly communication in the network.
 
 
 
