@@ -1783,6 +1783,59 @@ Because TCP is full-duplex, each direction of the connection must be closed **in
 > TCP uses a **three-way handshake to establish a reliable connection** and a **four-way teardown to release the connection properly**, ensuring robust and orderly communication in the network.
 
 
+# 请你说说 OSI 七层模型
+
+---
+
+## ✅ 一、什么是 OSI 七层模型？
+
+OSI（Open Systems Interconnection，开放系统互联）七层模型是国际标准化组织（ISO）制定的网络通信参考模型。它将网络通信过程划分为七个功能层次，以实现不同系统之间的互联互通。
+
+该模型的目的在于：**标准化网络功能、简化开发过程、实现互操作性、便于故障排查。**
+
+---
+
+## ✅ 二、七层从上到下分别是：
+
+| 层级 | 名称         | 主要功能描述 |
+|------|--------------|---------------|
+| 7    | 应用层       | 面向用户，提供网络服务，如 HTTP、FTP、SMTP |
+| 6    | 表示层       | 数据格式转换、加密、解密、压缩，如 JPEG、ASCII、SSL |
+| 5    | 会话层       | 管理会话（建立、维持、终止会话） |
+| 4    | 传输层       | 端到端的数据传输、差错控制、流量控制，如 TCP、UDP |
+| 3    | 网络层       | 寻址与路径选择，负责逻辑地址 IP，如 IP、ICMP |
+| 2    | 数据链路层   | 建立链路、帧传输、差错检测，如 ARP、PPP、MAC |
+| 1    | 物理层       | 传输比特流，涉及电压、电缆、接口标准，如 RJ45、光纤 |
+
+---
+
+## ✅ 三、常见协议或技术举例
+
+| 层级 | 常见协议 / 技术                        |
+|------|-----------------------------------------|
+| 应用层 | HTTP, HTTPS, FTP, SMTP, DNS             |
+| 表示层 | JPEG, MPEG, TLS, SSL                   |
+| 会话层 | NetBIOS, RPC                           |
+| 传输层 | TCP, UDP                                |
+| 网络层 | IP (IPv4/IPv6), ICMP, IGMP              |
+| 数据链路层 | ARP, RARP, Ethernet, PPP              |
+| 物理层 | RJ45, USB, 光纤, 电压标准                |
+
+---
+
+## ✅ 四、一句话记忆口诀：
+
+> "**应表会传网数物**" —— 应用、表示、会话、传输、网络、数据链路、物理
+
+或者记忆英文首字母顺序为：
+
+> **A P S T N D P**（Application, Presentation, Session, Transport, Network, Data Link, Physical）
+
+---
+
+## ✅ 五、总结
+
+> OSI 七层模型为网络通信提供了清晰的分层结构，便于协议设计、系统开发和故障排查。它是理解网络原理的基础框架，虽然实际应用中更多使用 TCP/IP 四层模型，但 OSI 模型仍是教学与理论的重要参考。
 
 
 
