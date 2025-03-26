@@ -50,6 +50,9 @@ dic = {
     "9": ["w", "x", "y", "z"],
 }
 
+# digits
+digits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
 # Sudoku
 tx = i//3
 ty = j//3
