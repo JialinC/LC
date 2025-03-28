@@ -52,6 +52,14 @@ dic = {
 
 # digits
 digits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+digits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+
+# count char in str
+count = [0] * 26
+for c in s:
+    count[ord(c) - ord("a")] += 1
+
+# isalnum(): checks if all characters in a string are alphanumeric (letters or numbers)
 
 # Sudoku
 tx = i//3
