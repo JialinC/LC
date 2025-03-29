@@ -59,6 +59,8 @@ count = [0] * 26
 for c in s:
     count[ord(c) - ord("a")] += 1
 
+# isdigit():
+# isalpha():
 # isalnum(): checks if all characters in a string are alphanumeric (letters or numbers)
 
 # Sudoku
