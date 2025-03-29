@@ -203,6 +203,27 @@ class Codec:
 
         return deser(index)
 
+# parent pointer
+# Stack for tree traversal
+stack = [root]
+# Dictionary for parent pointers
+parent = {root: None}
+
+while stack:
+    node = stack.pop()
+    # While traversing the tree, keep saving the parent pointers.
+    if node.left:
+        parent[node.left] = node
+        stack.append(node.left)
+    if node.right:
+        parent[node.right] = node
+        stack.append(node.right)
+
+# all ancestors of a node
+while p:
+    ancestors.add(p)
+    p = parent[p]
+
 ### Binary Searh Tree ###
 # Insert into a Binary Search Tree
 def insert(root, val):
