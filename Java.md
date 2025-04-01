@@ -1261,6 +1261,724 @@ PhantomReference<String> phantomRef = new PhantomReference<>(new String("hello")
 ```
 
 
+## 2. 集合类
+
+### 2.1 Java中有哪些容器（集合类）？
+**参考答案**
+
+Java中的集合类主要由 `Collection` 和 `Map` 这两个接口派生而出，其中 `Collection` 接口又派生出三个子接口，分别是：`Set`、`List`、`Queue`。所有的 Java 集合类，都是 `Set`、`List`、`Queue`、`Map` 这四个接口的实现类。
+
+这四个接口将集合分成了四大类，其中：
+
+- **Set**：代表**无序的、元素不可重复**的集合；
+- **List**：代表**有序的、元素可以重复**的集合；
+- **Queue**：代表**先进先出（FIFO）**的队列；
+- **Map**：代表**具有映射关系（key-value）**的集合。
+
+---
+
+这些接口拥有众多的实现类，其中最常用的实现类有：
+
+- `HashSet`
+- `TreeSet`
+- `ArrayList`
+- `LinkedList`
+- `ArrayDeque`
+- `HashMap`
+- `TreeMap`
+
+---
+
+### 扩展阅读
+
+#### Collection体系的继承树：
+![Collection](/image/collections.jpg)
+
+#### Map体系的继承树：
+![Map](/image/map.jpg)
+
+> 💡 注：  
+> - **紫色框体**代表接口，其中**加粗**的是代表四类集合的接口；  
+> - **蓝色框体**代表实现类，其中**有阴影**的是常用实现类。
 
 
+## 2.2 Java中的容器，线程安全和线程不安全的分别有哪些？
+**参考答案**
+
+`java.util` 包下的集合类大部分都是**线程不安全的**，例如：
+
+- `HashSet`
+- `TreeSet`
+- `ArrayList`
+- `LinkedList`
+- `ArrayDeque`
+- `HashMap`
+- `TreeMap`
+
+这些集合类的优点是**性能好**，但不适用于多线程环境。如果需要线程安全的集合类，可以使用 `Collections` 工具类提供的 `synchronizedXxx()` 方法，将它们包装成线程安全的集合。
+
+---
+
+`java.util` 包下也有一些**线程安全的**集合类，例如：
+
+- `Vector`
+- `Hashtable`
+
+这两个类虽然是线程安全的，但属于**较老的API**，**性能较差**。所以，即使需要线程安全，**不推荐直接使用**这些类，而是推荐使用包装的方式或 `java.util.concurrent` 包下的集合类。
+
+---
+
+### 从 Java 5 开始，Java 在 `java.util.concurrent` 包下提供了大量支持高效并发访问的集合类：
+
+#### ① 以 `Concurrent` 开头的集合类：
+
+- 支持**多个线程并发写入访问**
+- 写操作是**线程安全的**
+- 读操作**无需加锁**
+- 内部使用**复杂算法**避免锁住整个集合，提高并发性能
+
+#### ② 以 `CopyOnWrite` 开头的集合类：
+
+- 写操作会**复制一份新的数组**
+- 读操作**无需加锁**
+- 写操作是线程安全的
+- 适用于**读多写少**的场景
+
+---
+
+### 扩展阅读
+
+> `java.util.concurrent` 包下线程安全集合类的体系结构：  
+![Map](/image/concurrent.jpg)
+
+---
+
+## 2.3 Map接口有哪些实现类？
+**参考答案**
+
+`Map` 接口常用的实现类有：
+
+- `HashMap`
+- `LinkedHashMap`
+- `TreeMap`
+- `ConcurrentHashMap`
+
+### 使用场景建议：
+
+- **不需要排序：**
+  - 首选 `HashMap`，性能最好
+  - 若需线程安全：使用 `ConcurrentHashMap`
+    - `ConcurrentHashMap` 性能优于 `Hashtable`，因为它使用**分段锁/CAS机制**，而 `Hashtable` 的 `put` 和 `get` 都加锁
+
+- **需要排序：**
+  - 按**插入顺序排序**：使用 `LinkedHashMap`
+  - 按**自然顺序或自定义顺序排序**：使用 `TreeMap`
+  - 若需线程安全：可通过 `Collections.synchronizedMap()` 包装为线程安全版本
+
+
+## 2.4 描述一下Map put的过程
+**参考答案**
+
+`HashMap` 是最经典的 `Map` 实现，下面以它为例来说明 `put` 的过程：
+
+---
+
+### 🛠️ **1. 首次扩容：**
+
+- 判断数组是否为空（即 table == null）；
+- 如果为空，则调用 `resize()` 方法进行**第一次扩容**。
+
+---
+
+### 📍 **2. 计算索引：**
+
+- 使用键的 `hashCode()`，经过扰动函数处理后计算出键的哈希值；
+- 根据哈希值与数组长度计算出**该键值对应在数组中的索引**。
+
+---
+
+### 📥 **3. 插入数据：**
+
+根据索引位置的情况有以下几种处理方式：
+
+- **如果当前位置为空**：  
+  直接在该位置插入节点。
+
+- **如果当前位置不为空且 key 已存在**：  
+  覆盖旧值（即更新 value）。
+
+- **如果当前位置不为空且 key 不存在**：  
+  将新节点挂到链表或红黑树的末尾。
+
+- **如果链表长度达到 8 且数组长度 >= 64**：  
+  将链表**转换为红黑树**以提高查找性能。
+
+---
+
+### 🚀 **4. 再次扩容：**
+
+- 如果当前元素个数（`size`）**超过 threshold**（默认是数组长度的 0.75 倍），
+  则会触发 `resize()` 方法进行**数组扩容**，容量变为原来的 2 倍。
+
+---
+
+### 📚 **扩展阅读**
+
+![Map](/image/Mapput.png)
+
+
+## 2.5 如何得到一个线程安全的Map？
+**参考答案**
+
+获取线程安全的 `Map` 有以下几种方式：
+
+- 使用 `Collections` 工具类的 `synchronizedMap()` 方法，将线程不安全的 `Map` 包装成线程安全的：
+  ```java
+  Map<K, V> syncMap = Collections.synchronizedMap(new HashMap<>());
+  ```
+
+- 使用 `java.util.concurrent` 包下的并发类，例如：
+  ```java
+  Map<K, V> concurrentMap = new ConcurrentHashMap<>();
+  ```
+
+- ❗ 不建议使用 `Hashtable`，尽管它是线程安全的，但性能较差。
+
+---
+
+## 2.6 HashMap有什么特点？
+**参考答案**
+
+- `HashMap` 是**线程不安全**的；
+- `HashMap` 允许 `null` 作为 **key** 和 **value**：
+  - 最多只能有一个 `null` key；
+  - 可以有多个 `null` value。
+
+---
+
+## 2.7 JDK7和JDK8中的HashMap有什么区别？
+**参考答案**
+
+### JDK7 中的 HashMap：
+
+- 基于 **数组 + 链表** 实现；
+- 底层使用 `Entry[]` 数组存储数据；
+- 当多个键的哈希值相同（发生哈希冲突）时，将键值对以链表的形式存储；
+- **缺点**：当哈希冲突严重时，链表过长会导致查找效率低，时间复杂度为 **O(N)**。
+
+### JDK8 中的 HashMap：
+
+- 基于 **数组 + 链表 + 红黑树** 实现；
+- 底层使用 `Node[]` 数组代替 `Entry[]`；
+- 当链表长度 ≥ 8 且数组长度 ≥ 64 时，链表会转换为红黑树；
+- 红黑树查找效率为 **O(logN)**，显著提高了性能。
+
+---
+
+## 2.8 介绍一下HashMap底层的实现原理
+**参考答案**
+
+### 💾 存储过程（put）：
+
+- 将 `K/V` 传给 `put()` 方法；
+- 调用 `K.hashCode()` 计算出 hash 值；
+- 根据 hash 定位到桶（bucket）的位置；
+- 判断当前位置是否为空：
+  - 如果为空：直接插入；
+  - 如果非空：
+    - 若 key 已存在：更新 value；
+    - 若 key 不存在：链表或红黑树中插入新节点；
+- 若 size > threshold（容量 × 加载因子），触发 **resize（扩容）**。
+
+### 🔍 获取过程（get）：
+
+- 将 key 传入 `get()`；
+- 使用 `hashCode()` 计算 hash 定位 bucket；
+- 在 bucket 中查找节点，通过 `equals()` 比较 key 是否匹配，找到则返回对应 value。
+
+### 💥 碰撞处理：
+
+- 使用**链表法**解决 hash 冲突；
+- 在 Java 8 中，链表长度 ≥ 8 会转为红黑树，以提高查找效率；
+- 转树要求数组长度 ≥ 64。
+
+---
+
+## 2.9 介绍一下 HashMap 的扩容机制
+**参考答案**
+
+- HashMap 的 **数组初始容量为 16**，且容量总是 **2 的幂次方**。
+  - ✅ 这样设计的好处是可以使用位运算代替取模运算，从而提高性能（据说可提升 5~8 倍）。
+
+---
+
+### 📊 扩容的触发条件
+
+- HashMap 是否需要扩容，是通过**负载因子（Load Factor）**判断的。
+- 默认负载因子为 **0.75**，即：
+  ```text
+  当元素个数 ≥ 当前数组容量 × 0.75 时，触发扩容。
+  ```
+- 负载因子可以通过构造函数自定义：
+  - **较大负载因子**（如 > 1）：减少扩容次数，节省内存但降低性能；
+  - **较小负载因子**：提升性能但增加内存开销。
+
+---
+
+### 🧱 碰撞解决与结构转换
+
+- HashMap 使用**单向链表**解决哈希碰撞。
+- 当**链表长度 ≥ 8**，会尝试将链表转换为**红黑树**以提高查找效率；
+- 当**链表长度 ≤ 6** 且结构为红黑树时，会将其转换回链表；
+- ❗ 但在转换为红黑树之前，还要满足数组容量 **≥ 64** 的条件：
+  - 如果数组未达到 64，则优先 **扩容** 而不是转换为红黑树。
+
+---
+
+### 🧠 扩容原理详解
+
+- 假设当前数组容量为 `n`，扩容后变为 `2n`；
+- 原有的哈希值不需要重新计算，只需判断新增的高位 bit 是 **0 或 1**；
+  - 若是 **0**，则新的索引和旧索引一致；
+  - 若是 **1**，则新的索引为 `原索引 + oldCap`。
+
+这是一种非常巧妙的设计，带来了两大优势：
+
+1. **避免重新计算 hash**；
+2. **将碰撞节点更均匀地分散到新数组中**，提升性能。
+
+---
+
+### 📚 扩展阅读
+
+- **示例**：从容量 16 扩容为 32 时的变化
+![Map](/image/hashmap1.png)
+
+因此元素在重新计算hash之后，因为n变为2倍，那么n-1的mask范围在高位多1bit(红色)，因此新的index就会发生这样的变化：
+
+![Map](/image/hashmap2.png)
+
+因此，我们在扩充HashMap的时候，不需要重新计算hash，只需要看看原来的hash值新增的那个bit是1还是0就好了，是0的话索引没变，是1的话索引变成“原索引+oldCap”。可以看看下图为16扩充为32的resize示意图：
+
+![Map](/image/hashmap3.png)
+
+这个设计确实非常的巧妙，既省去了重新计算hash值的时间，而且同时，由于新增的1bit是0还是1可以认为是随机的，因此resize的过程，均匀的把之前的冲突的节点分散到新的bucket了。
+
+
+## 2.10 HashMap 中的循环链表是如何产生的？
+
+**参考答案**
+
+在多线程的情况下，当重新调整 HashMap 大小时，可能发生条件竞争。如果两个线程同时检测到需要 resize，就可能同时进行扩容。在扩容过程中，链表中的元素在移动时会被插入到新 bucket 的头部（而不是尾部），是为了避免尾部遍历。然而如果操作被打断并交错执行，就可能出现链表反转并自我引用，最终导致**死循环**。
+
+---
+
+## 2.11 HashMap 为什么用红黑树而不用 B 树？
+
+**参考答案**
+
+B/B+ 树更适合用于外存，如数据库索引，属于磁盘友好型数据结构。
+
+而 HashMap 的设计基于数组 + 链表结构，为了优化链表查找效率，使用红黑树替换长链表。在内存中，**红黑树比 B 树更适合**，因为数据量较小时，B 树节点未分裂，可能导致效率退化成链表遍历。
+
+---
+
+## 2.12 HashMap 为什么线程不安全？
+
+**参考答案**
+
+在并发情况下同时执行 `put()` 操作，可能会引起链表插入顺序反转，甚至**形成循环链表**，从而引发**死循环**。
+
+---
+
+## 2.13 HashMap 如何实现线程安全？
+
+**参考答案**
+
+- ✅ 使用 `Hashtable` 类（已过时，性能差）；
+- ✅ 使用 `ConcurrentHashMap`（推荐）；
+- ✅ 使用 `Collections.synchronizedMap()` 对 HashMap 进行包装。
+
+---
+
+## 2.14 HashMap 是如何解决哈希冲突的？
+
+**参考答案**
+
+HashMap 采用了**链表 + 红黑树**结构：
+
+- 默认通过链表解决冲突；
+- 当链表长度超过阈值（默认 8）并且桶数组大小 ≥ 64 时，转为红黑树；
+- 当树节点数少于阈值（默认 6）时，又会转换为链表。
+
+---
+
+## 2.15 HashMap 和 HashTable 的区别？
+
+**参考答案**
+
+| 特性            | HashMap                          | Hashtable                      |
+|-----------------|----------------------------------|--------------------------------|
+| 线程安全        | ❌ 非线程安全                    | ✅ 线程安全                     |
+| null 键/值支持   | ✅ 支持 null 作为 key 或 value   | ❌ 不支持 null 作为 key 或 value |
+| 性能            | 高（适用于单线程）              | 较低（使用 synchronized）       |
+| 设计年代        | JDK 1.2 后的新类                | 早期类（不符合命名规范）        |
+
+**扩展阅读**
+
+- `Hashtable` 命名不规范（应该是 `HashTable`）；
+- 避免使用 `Hashtable`，推荐使用 `ConcurrentHashMap` 或包装后的 `HashMap`。
+
+---
+
+## 2.16 HashMap 与 ConcurrentHashMap 有什么区别？
+
+**参考答案**
+
+| 特性              | HashMap                        | ConcurrentHashMap                            |
+|-------------------|--------------------------------|-----------------------------------------------|
+| 线程安全          | ❌ 非线程安全                  | ✅ 线程安全（高性能）                         |
+| 并发风险          | 可能产生死循环，数据不一致     | 无需全局锁，避免死锁，支持高并发             |
+| 同步机制          | 无或通过包装实现（synchronized） | 分段锁（JDK7）或 CAS + synchronized（JDK8） |
+| 推荐使用场景      | 单线程环境                    | 多线程并发读写环境                            |
+
+**说明**
+
+- `HashMap` 不适用于并发；
+- `ConcurrentHashMap` 设计精巧，通过降低锁粒度、分段同步、CAS 操作等机制提升性能；
+- 检索操作在 `ConcurrentHashMap` 中通常是无锁的。
+
+
+## 2.17 介绍一下 ConcurrentHashMap 是怎么实现的？
+
+**参考答案**
+
+### JDK 1.7 中的实现：
+
+- `ConcurrentHashMap` 由 **Segment** 数据结构和 **HashEntry[]** 构成。
+- 使用 **分段锁**（Segment 继承自 `ReentrantLock`）保证线程安全。
+- 整体结构是：
+  ```
+  ConcurrentHashMap
+      └─ Segment[]
+            └─ HashEntry[]
+  ```
+- 每个 Segment 管理一部分数据，相当于多个小型的 `HashMap`，提升并发性能。
+
+![Map](/image/concurrenthashmap1.png)
+
+---
+
+### JDK 1.8 中的实现：
+
+- 弃用了 Segment，结构变为：
+  ```
+  Node[] + 链表 + 红黑树
+  ```
+- 并发控制采用：
+  - `synchronized`（加锁粒度小）
+  - `CAS`（无锁优化）
+- 实际表现为一个 **线程安全、性能优化后的 HashMap**。
+
+![Map](/image/concurrenthashmap2.png)
+---
+
+## 2.18 ConcurrentHashMap 是怎么分段分组的？
+
+**参考答案**
+
+### get 操作：
+
+- 执行一次 hash，然后定位到某个 Segment，再 hash 找到 Node。
+- 全过程基本 **无需加锁**，依赖于 `volatile` 的内存可见性。
+- 如果读到 null，则会 **加锁重读**。
+
+---
+
+### put 操作流程：
+
+1. 判断是否需要扩容；
+2. 定位 Segment，若为 null 则通过 CAS 初始化；
+3. 再次 hash 定位 Node；
+4. 插入新数据时：
+   - 尝试获取锁（`tryLock()`）；
+   - 成功则插入；
+   - 若失败，则自旋等待；
+   - 超过阈值后挂起，等待唤醒。
+
+---
+
+## 2.19 说一说你对 LinkedHashMap 的理解
+
+**参考答案**
+
+- `LinkedHashMap` 是基于 `HashMap` 的子类。
+- 使用 **双向链表** 维护键值对的插入顺序（按 key 顺序）。
+- 优点：
+  - 相比 `HashMap`，能保持遍历顺序；
+  - 相比 `TreeMap`，性能更好；
+- 缺点：
+  - 需要维护链表，**性能略低于 HashMap**；
+  - 但迭代性能更优。
+
+---
+
+## 2.20 请介绍 LinkedHashMap 的底层原理
+
+**参考答案**
+
+- `LinkedHashMap` 继承自 `HashMap`；
+- 除了 HashMap 的数组 + 链表结构外，额外维护了 **一个双向链表**；
+- 每个节点除了 `key`, `value`, `next`，还包含：
+  - `before`（前驱节点）
+  - `after`（后继节点）
+
+**工作原理图示：**
+
+```
+head <-> node1 <-> node2 <-> node3 <-> ... <-> tail
+```
+
+- 新节点会追加在 tail 节点之后；
+- 插入顺序和遍历顺序始终一致；
+- 重写部分方法用于链表维护，其余功能继承自 `HashMap`。
+
+## 2.21 请介绍 TreeMap 的底层原理
+
+**参考答案：**
+
+TreeMap 基于红黑树（Red-Black Tree）实现。映射根据其键的自然顺序进行排序，或者根据创建映射时提供的 Comparator 进行排序，具体取决于使用的构造方法。TreeMap 的基本操作 `containsKey`、`get`、`put`、`remove` 方法，其时间复杂度是 O(logN)。
+
+TreeMap 包含几个重要的成员变量：`root`、`size`、`comparator`。其中 `root` 是红黑树的根节点，它是 `Entry` 类型。`Entry` 是红黑树的节点，包含了红黑树的 6 个基本组成：
+
+- `key`
+- `value`
+- `left`
+- `right`
+- `parent`
+- `color`
+
+`Entry` 节点根据 `key` 排序，包含的内容是 `value`。`key` 的比较通过 `comparator` 实现。`size` 是红黑树的节点个数。
+
+---
+
+## 2.22 Map 和 Set 有什么区别？
+
+**参考答案：**
+
+- `Set` 代表无序的、元素不可重复的集合；
+- `Map` 代表具有映射关系（key-value）的集合，其所有的 `key` 是一个 `Set` 集合，即 `key` 无序且不能重复。
+
+---
+
+## 2.23 List 和 Set 有什么区别？
+
+**参考答案：**
+
+- `Set` 代表无序的、元素不可重复的集合；
+- `List` 代表有序的、元素可以重复的集合。
+
+---
+
+## 2.24 ArrayList 和 LinkedList 有什么区别？
+
+**参考答案：**
+
+- `ArrayList` 的实现是基于数组，`LinkedList` 的实现是基于双向链表；
+- 对于随机访问，`ArrayList` 优于 `LinkedList`，可以以 O(1) 的时间复杂度访问元素；
+- 对于插入和删除操作，`LinkedList` 优于 `ArrayList`，无需重新计算大小或更新索引；
+- `LinkedList` 更占内存，因为节点除了数据，还存储两个引用（前一个和后一个元素）。
+
+---
+
+## 2.25 有哪些线程安全的 List？
+
+**参考答案：**
+
+1. **Vector**
+   - 比较古老，保证线程安全，但效率低，不推荐使用。
+
+2. **Collections.SynchronizedList**
+   - `Collections` 提供的 `synchronizedList` 方法可以将非线程安全的 `List` 包装为线程安全。
+   - 扩展性和兼容性比 `Vector` 更好，但所有方法加锁，性能一般。
+
+3. **CopyOnWriteArrayList**
+   - Java 1.5 引入，位于 `java.util.concurrent` 包中。
+   - 写操作复制底层数组，读操作无需加锁。
+   - 写操作成本高，但在读取远多于写入的场景下是性能最优方案。
+
+---
+
+## 2.26 介绍一下 ArrayList 的数据结构？
+
+**参考答案：**
+
+- `ArrayList` 底层是数组实现，第一次插入元素时默认创建长度为 10 的数组。
+- 超出限制时会扩容 50%，并通过 `System.arraycopy()` 拷贝到新数组。
+- 按数组下标访问元素性能高，是基本优势；
+- 尾部插入性能也高；
+- 中间插入/删除需移动元素，性能较差，这是基本劣势。
+
+## 2.27 谈谈 CopyOnWriteArrayList 的原理
+
+**参考答案：**
+
+CopyOnWriteArrayList 是 Java 并发包中提供的并发类，是一个线程安全且**读操作无锁**的 ArrayList。
+
+正如其名称所示，在执行写操作时，它会复制一份新的 List，在该副本上完成写操作，然后再将引用指向新的 List，从而保证了写操作的线程安全。
+
+- **读操作：** 无需加锁，可并发访问，性能较高；
+- **写操作：** 上锁、复制原容器副本，在副本上修改，然后替换原容器的引用；
+- 写期间的读操作仍访问旧容器，**实现了读写分离**。
+
+**优点：**
+
+- 读操作性能高，无需同步；
+- 适合**读多写少**的场景；
+- 不会抛出 `ConcurrentModificationException` 异常，因为遍历和修改操作不作用在同一个容器。
+
+**缺点：**
+
+- **内存占用大**：每次写操作都会复制整个数组；
+- **实时性差**：写入期间读取到的是旧数据，无法保证读写强一致性。
+
+---
+
+## 2.28 说一说 TreeSet 和 HashSet 的区别
+
+**参考答案：**
+
+- 二者元素都不可重复，且线程不安全；
+- `HashSet` 的元素可以为 `null`，`TreeSet` 不允许 `null`；
+- `HashSet` 不保证元素顺序，`TreeSet` 支持**自然排序**或**定制排序**；
+- `HashSet` 底层使用 **哈希表**，`TreeSet` 底层使用 **红黑树**。
+
+---
+
+## 2.29 说一说 HashSet 的底层结构
+
+**参考答案：**
+
+- `HashSet` 基于 `HashMap` 实现；
+- 默认构造函数创建一个容量为 16，负载因子为 0.75 的 `HashMap`；
+- 内部封装了一个 `HashMap`，所有元素作为 `key` 存入；
+- 所有 `value` 为同一个静态常量 `PRESENT`（一个 `Object` 类型的占位符）。
+
+---
+
+## 2.30 BlockingQueue 中有哪些方法，为什么这样设计？
+
+**参考答案：**
+
+为了应对不同业务场景，`BlockingQueue` 提供了 4 组方法用于插入、移除及检查队列元素。每组方法在操作无法立即执行时表现不同：
+
+| 行为方式 | 插入方法               | 移除方法               | 检查方法     |
+|----------|------------------------|------------------------|--------------|
+| 抛异常   | `add(e)`               | `remove()`             | `element()`  |
+| 特定值   | `offer(e)`             | `poll()`               | `peek()`     |
+| 阻塞     | `put(e)`               | `take()`               | -            |
+| 超时     | `offer(e, time, unit)` | `poll(time, unit)`     | -            |
+
+**说明：**
+
+- **抛异常**：操作失败时抛出异常；
+- **返回特定值**：操作失败时返回 `false` 或 `null`；
+- **阻塞**：操作失败时阻塞直到成功；
+- **超时**：在限定时间内等待操作完成，否则返回失败。
+
+这样的设计使得 `BlockingQueue` 可灵活用于不同的并发场景，比如线程池、生产者消费者模型等。
+
+## 2.31 BlockingQueue 是怎么实现的？
+
+**参考答案：**
+
+`BlockingQueue` 是一个接口，常见实现类包括：
+
+- `ArrayBlockingQueue`
+- `LinkedBlockingQueue`
+- `DelayQueue`
+- `PriorityBlockingQueue`
+- `SynchronousQueue`
+
+它们主要区别在于存储结构和操作方式。但 `put` 和 `take` 方法的实现原理是类似的。
+
+以下以 `ArrayBlockingQueue` 为例说明：
+
+### 关键组件
+
+构造函数初始化了 `ReentrantLock` 和 `Condition`，用于同步控制：
+
+```java
+public ArrayBlockingQueue(int capacity, boolean fair) {
+    if (capacity <= 0)
+        throw new IllegalArgumentException();
+    this.items = new Object[capacity];
+    lock = new ReentrantLock(fair);
+    notEmpty = lock.newCondition();
+    notFull = lock.newCondition();
+}
+```
+
+## 2.32 Stream（不是IOStream）有哪些方法？
+
+**参考答案**
+
+Stream 提供了大量的方法进行聚集操作，这些方法既可以是“中间的”，也可以是“末端的”。
+
+**中间方法**：中间操作允许流保持打开状态，并允许直接调用后续方法。上面程序中的 `map()` 方法就是中间方法。中间方法的返回值是另外一个流。
+
+**末端方法**：末端方法是对流的最终操作。当对某个 Stream 执行末端方法后，该流将会被“消耗”且不再可用。上面程序中的 `sum()`、`count()`、`average()` 等方法都是末端方法。
+
+除此之外，关于流的方法还有如下两个特征：
+
+- **有状态的方法**：这种方法会给流增加一些新的属性，比如元素的唯一性、元素的最大数量、保证元素以排序的方式被处理等。有状态的方法往往需要更大的性能开销。
+- **短路方法**：短路方法可以尽早结束对流的操作，不必检查所有的元素。
+
+### Stream 常用的中间方法：
+
+- `filter(Predicate predicate)`：过滤 Stream 中所有不符合 predicate 的元素。
+- `mapToXxx(ToXxxFunction mapper)`：使用 ToXxxFunction 对流中的元素执行一对一的转换，该方法返回的新流中包含了 ToXxxFunction 转换生成的所有元素。
+- `peek(Consumer action)`：依次对每个元素执行一些操作，该方法返回的流与原有流包含相同的元素。该方法主要用于调试。
+- `distinct()`：该方法用于排序流中所有重复的元素（判断元素重复的标准是使用 equals() 比较返回 true）。这是一个有状态的方法。
+- `sorted()`：该方法用于保证流中的元素在后续的访问中处于有序状态。这是一个有状态的方法。
+- `limit(long maxSize)`：该方法用于保证对该流的后续访问中最大允许访问的元素个数。这是一个有状态的、短路方法。
+
+### Stream 常用的末端方法：
+
+- `forEach(Consumer action)`：遍历流中所有元素，对每个元素执行 action。
+- `toArray()`：将流中所有元素转换为一个数组。
+- `reduce()`：该方法有三个重载的版本，都用于通过某种操作来合并流中的元素。
+- `min()`：返回流中所有元素的最小值。
+- `max()`：返回流中所有元素的最大值。
+- `count()`：返回流中所有元素的数量。
+- `anyMatch(Predicate predicate)`：判断流中是否至少包含一个元素符合 Predicate 条件。
+- `noneMatch(Predicate predicate)`：判断流中是否所有元素都不符合 Predicate 条件。
+- `findFirst()`：返回流中的第一个元素。
+- `findAny()`：返回流中的任意一个元素。
+
+除此之外，Java 8 允许使用流式 API 来操作集合，`Collection` 接口提供了一个 `stream()` 默认方法，该方法可返回该集合对应的流，接下来即可通过流式 API 来操作集合元素。由于 Stream 可以对集合元素进行整体的聚集操作，因此 Stream 极大地丰富了集合的功能。
+
+---
+
+### 扩展阅读
+
+Java 8 新增了 `Stream`、`IntStream`、`LongStream`、`DoubleStream` 等流式 API，这些 API 代表多个支持串行和并行聚集操作的元素。上面 4 个接口中，`Stream` 是一个通用的流接口，而 `IntStream`、`LongStream`、`DoubleStream` 则代表元素类型为 int、long、double 的流。
+
+Java 8 还为上面每个流式 API 提供了对应的 `Builder`，例如：
+
+- `Stream.Builder`
+- `IntStream.Builder`
+- `LongStream.Builder`
+- `DoubleStream.Builder`
+
+开发者可以通过这些 Builder 来创建对应的流。
+
+### 独立使用 Stream 的步骤如下：
+
+1. 使用 `Stream` 或 `XxxStream` 的 `builder()` 类方法创建该 Stream 对应的 Builder。
+2. 重复调用 Builder 的 `add()` 方法向该流中添加多个元素。
+3. 调用 Builder 的 `build()` 方法获取对应的 Stream。
+4. 调用 Stream 的聚集方法。
+
+在上面 4 个步骤中，第 4 步可以根据具体需求来调用不同的方法，Stream 提供了大量的聚集方法供用户调用，具体可参考 `Stream` 或 `XxxStream` 的 API 文档。对于大部分聚集方法而言，每个 Stream 只能执行一次。
 
